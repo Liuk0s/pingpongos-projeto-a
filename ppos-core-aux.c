@@ -309,6 +309,12 @@ void after_task_exit () {
         taskExec->activations);
 }
 
+//Se a main (task 0) terminou, sinaliza disk manager para encerrar
+    if (taskExec->id == 0) {
+        extern void disk_mgr_shutdown();  // Declara função do ppos_disk.c
+        disk_mgr_shutdown();
+    }
+
 /**
  * Contabiliza tempo da tarefa que está saindo do processador
  */
