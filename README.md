@@ -1,14 +1,12 @@
-# PingPongOS - Projeto A: Escalonador, Preempção e Contabilização
+# PingPongOS - Projetos A e B: Sistema Operacional Educacional
 
-Este repositório contém a implementação das funcionalidades de escalonamento por prioridades, preempção por tempo e contabilização de recursos para o PingPongOS, um sistema operacional educacional desenvolvido para a disciplina de Sistemas Operacionais.
+Este repositório contém a implementação dos **Projetos A e B** do PingPongOS, um sistema operacional educacional desenvolvido para a disciplina de Sistemas Operacionais.
 
 ## Autores da Implementação
-
-- **Iaritzza Bielinki**
-- **Lucas Giovanni Thuler**
+- **Iaritzza Bielinki** (Projeto A)
+- **Lucas Giovanni Thuler** (Projetos A e B)
 
 ## Créditos e Contexto Acadêmico
-
 - **Disciplina**: Sistemas Operacionais (EC) - UTFPR
 - **Professor**: Marco Aurélio Wehrmeister
 - **Sistema Base**: PingPongOS - criado pelo Prof. Carlos Maziero (DInf/UFPR)
@@ -16,13 +14,23 @@ Este repositório contém a implementação das funcionalidades de escalonamento
 
 *A autoria de todo o material base utilizado é do prof. Carlos Maziero (DInf/UFPR), que gentilmente o cedeu para aplicação nesta disciplina.*
 
-## Sobre o Projeto
+## Sobre os Projetos
 
-O PingPongOS é um sistema operacional educacional criado para demonstrar conceitos fundamentais de sistemas operacionais. Este projeto implementa três funcionalidades específicas solicitadas no **Projeto A**:
+O PingPongOS é um sistema operacional educacional criado para demonstrar conceitos fundamentais de sistemas operacionais. Este repositório implementa as funcionalidades de dois projetos distintos:
 
+### **Projeto A - Escalonador, Preempção e Contabilização**
 1. **Escalonador por Prioridades com Aging**
-2. **Sistema de Preempção por Tempo**  
+2. **Sistema de Preempção por Tempo**
 3. **Contabilização de Uso do Processador**
+
+### **Projeto B - Gerenciador de Disco**
+1. **Gerenciador de Disco Virtual**
+2. **Escalonadores de Requisições de Disco (FCFS, SSTF, CSCAN)**
+3. **Sistema de Métricas de Performance**
+
+---
+
+# Projeto A - Escalonador, Preempção e Contabilização
 
 ## Funcionalidades Implementadas
 
@@ -50,208 +58,340 @@ O PingPongOS é um sistema operacional educacional criado para demonstrar concei
 
 ### 4. Funções de Suporte
 - **`systime()`**: Retorna tempo do sistema em milissegundos
-- **`task_setprio()`**: Define prioridade estática de uma tarefa  
+- **`task_setprio()`**: Define prioridade estática de uma tarefa
 - **`task_getprio()`**: Consulta prioridade estática de uma tarefa
-- **Hooks de sistema**: Instrumentação completa do ciclo de vida das tarefas
+- **Hooks de sistema**: Instrumentação do ciclo de vida das tarefas
+
+---
+
+# Projeto B - Gerenciador de Disco
+
+## Funcionalidades Implementadas
+
+### 1. Gerenciador de Disco Virtual
+- **Interface de acesso**: `disk_mgr_init()`, `disk_block_read()`, `disk_block_write()`
+- **Tarefa gerenciadora**: Processa requisições de forma assíncrona
+- **Controle de concorrência**: Semáforos para proteção de estruturas críticas
+- **Handler de sinais**: Processa sinais SIGUSR1 do disco virtual
+
+### 2. Algoritmos de Escalonamento de Disco
+
+#### **FCFS (First Come, First Served)**
+- **Estratégia**: Primeira requisição que chega é a primeira atendida
+- **Características**: Simples, justo, mas pode não ser eficiente
+- **Uso**: Adequado para cargas leves ou sistemas simples
+
+#### **SSTF (Shortest Seek Time First)**
+- **Estratégia**: Atende requisição mais próxima da posição atual da cabeça
+- **Características**: Minimiza movimento da cabeça, otimiza throughput
+- **Limitação**: Pode causar starvation para requisições distantes
+
+#### **CSCAN (Circular Scan)**
+- **Estratégia**: Move cabeça sempre em direção crescente, retorna ao início circularmente
+- **Características**: Garante tempo limitado de espera, evita starvation
+- **Vantagem**: Balanceamento entre eficiência e fairness
+
+### 3. Sistema de Métricas
+- **Rastreamento de performance**: Posição da cabeça, movimentos totais, requisições processadas
+- **Estatísticas operacionais**: Contadores de leitura/escrita, distância percorrida, tempo de resposta
+- **Relatórios comparativos**: Análise de performance entre algoritmos
+- **Exportação de dados**: Métricas exportáveis em formato CSV
+
+### 4. Arquitetura Modular
+- **Processamento separado**: Eventos de conclusão e novas requisições em módulos distintos
+- **Configuração flexível**: Política de escalonamento configurável via compilação
+- **Validação de parâmetros**: Verificação de parâmetros e estados do sistema
 
 ## Estrutura do Repositório
 
 ```
 projeto/
-├── entrega/                       # Arquivos para submissão acadêmica
-│   ├── pa-ppos-core-aux.c
+├── entrega/                    # Arquivos para submissão acadêmica
+│   ├── pa-ppos-core-aux.c      # Projeto A
 │   ├── pa-ppos-core-aux-modificacoes.txt
-│   └── pa-ppos-data.h
-├── educational/                   # Versão educacional
-│   └── ppos-core-aux-tutorial.c
-├── expected-output/               # Saídas de referência dos testes
+│   ├── pa-ppos_data.h
+│   ├── pb-ppos_disk.c          # Projeto B
+│   ├── pb-ppos_disk.h
+│   ├── pb-ppos-core-task-aux.c
+│   └── pb-ppos_data.h
+├── educational/                # Versões educacionais e fortemente comentadas (apenas do projeto A, por enquanto)
+│   ├── ppos-core-aux-tutorial.c
+│   └── ppos_disk-tutorial.c
+├── expected-output/            # Saídas de referência dos testes
 │   ├── pingpong-dispatcher.txt
 │   ├── pingpong-scheduler.txt
 │   ├── pingpong-preempcao.txt
 │   ├── pingpong-contab-prio.txt
-│   └── pingpong-preempcao-stress.txt
-├── ppos-core-aux.c               # Implementação principal
-├── queue.o                       # Biblioteca de filas (fornecida)
-├── ppos-all.o                   # Núcleo do PingPongOS (fornecido)
-├── pingpong-*.c                 # Programas de teste (fornecidos)
-├── bin/                         # Executáveis compilados (gerado)
-├── output/                      # Resultados dos testes (gerado)
+│   ├── pingpong-preempcao-stress.txt
+│   ├── pingpong-disco1.txt
+│   └── pingpong-disco2.txt
+├── ppos-core-aux.c           # Implementação Projeto A
+├── ppos_disk.c               # Implementação Projeto B
+├── ppos_disk.h               # Interface Projeto B
+├── queue.o                   # Biblioteca de filas (fornecida)
+├── ppos-all.o               # Núcleo do PingPongOS (fornecido)
+├── disk-driver.o            # Driver de disco virtual (fornecido)
+├── pingpong-*.c             # Programas de teste (fornecidos)
+├── disk.dat                 # Dados do disco virtual
+├── bin/                     # Executáveis compilados (gerado)
+├── output/                  # Resultados dos testes (gerado)
 ├── README.md
 └── Makefile
 ```
 
-### Arquivos de Entrega
+## Makefile
 
-Os seguintes arquivos estão formatados conforme os requisitos da disciplina:
+O sistema inclui um makefile que detecta automaticamente qual projeto está disponível baseado nos arquivos presentes no diretório.
 
-- **`pa-ppos-core-aux.c`**: Implementação principal do Projeto A
-- **`pa-ppos-core-aux-modificacoes.txt`**: Documentação das modificações realizadas  
-- **`pa-ppos-data.h`**: Definições de dados específicas do projeto (se necessário)
+### Detecção Automática
+```bash
+make all                    # Detecta e compila projeto disponível
+make detect-project         # Mostra qual projeto foi detectado
+make show-project-status    # Status dos projetos
+```
 
-O arquivo `pa-ppos-core-aux-modificacoes.txt` documenta:
-- Funções implementadas
-- Modificações realizadas no código base
-- Decisões de design tomadas
-- Explicação das escolhas técnicas
+### Compilação por Projeto
+```bash
+# Força projeto específico
+make project-a              # Compila Projeto A
+make project-b              # Compila Projeto B
+make PROJECT=A all          # Via variável de ambiente
+make PROJECT=B all          # Via variável de ambiente
+```
 
-### Versões do Código
+### Projeto A - Escalonador
+```bash
+# Compilação
+make project-a
 
-- **Versão de Entrega** (`entrega/`): Arquivos formatados para submissão acadêmica
-- **Versão de Trabalho** (raiz): Código com comentários equilibrados usado durante desenvolvimento
-- **Versão Tutorial** (`educational/`): Código com comentários extensivos para fins didáticos
+# Testes
+make test-project-a
+make run-scheduler          # Execução na tela
+make run-preempcao
+make run-contab
+```
 
-*A versão tutorial contém explicações detalhadas de todos os conceitos implementados, ideal para estudo e referência educacional.*
+### Projeto B - Disco (⚠️ Modifica disk.dat)
 
-### Saídas de Referência
+#### Compilação (não executa)
+```bash
+make project-b              # Compila todos os schedulers
+make disco1-all             # Compila disco1 (todos schedulers)
+make disco2-all             # Compila disco2 (todos schedulers)
+make scheduler-fcfs         # Compila apenas FCFS
+make scheduler-sstf         # Compila apenas SSTF
+make scheduler-cscan        # Compila apenas CSCAN
+```
 
-A pasta `expected-output/` contém as saídas esperadas de cada teste para comparação e validação:
-- Facilita verificação se implementação está correta
-- Permite comparação com resultados obtidos (`output/` vs `expected-output/`)
-- Útil para debug e análise de diferenças
+#### Gerenciamento de Backup
+```bash
+make backup-disk            # Faça backup primeiro!
+make restore-disk           # Restaura disk.dat do backup
+```
 
-## Arquivo Principal: `ppos-core-aux.c`
+#### Testes Individuais
+```bash
+# Por teste específico
+make disco1-fcfs            # Disco1 com FCFS
+make disco1-sstf            # Disco1 com SSTF
+make disco1-cscan           # Disco1 com CSCAN
+make disco2-fcfs            # Disco2 com FCFS
+make disco2-sstf            # Disco2 com SSTF
+make disco2-cscan           # Disco2 com CSCAN
 
-Este arquivo contém toda nossa implementação, organizada em seções:
+# Agrupados
+make disco1-all-tests       # Todos os testes do disco1
+make disco2-all-tests       # Todos os testes do disco2
+make test-fcfs-only         # Apenas FCFS (disco1+disco2)
+make test-sstf-only         # Apenas SSTF (disco1+disco2)
+make test-cscan-only        # Apenas CSCAN (disco1+disco2)
+```
 
-- **Seção 1**: Constantes e configurações do sistema
-- **Seção 2**: Implementação do escalonador (`scheduler()`)
-- **Seção 3**: Função de tempo (`systime()`)
-- **Seção 4**: Gerenciamento de prioridades (`task_setprio()`, `task_getprio()`)
-- **Seção 5**: Sistema de preempção (`interrupt_handler()`, `timer_init()`)
-- **Seção 6-7**: Hooks de inicialização e gerenciamento de tarefas
+#### Execução na Tela
+```bash
+make run-disco1-fcfs        # Execução direta na tela
+make run-disco2-sstf        # (útil para debug)
+make run-disco2-cscan
+```
 
-## Como Usar
+#### Análise Comparativa
+```bash
+make test-project-b         # Executa todos e gera relatório
+make compare-disk-results   # Gera relatório comparativo
+make extract-disk-metrics   # Extrai métricas para CSV
+```
 
-### Pré-requisitos
+### Fluxo Recomendado (Projeto B)
+```bash
+# 1. Backup de segurança
+make backup-disk
+
+# 2. Compilação
+make project-b
+
+# 3. Teste individual
+make disco1-fcfs
+
+# 4. Análise completa (opcional)
+make test-project-b
+
+# 5. Restauração (se necessário)
+make restore-disk
+```
+
+## Pré-requisitos
 - GCC (GNU Compiler Collection)
 - Make
 - Sistema Unix/Linux
-- Arquivos base do PingPongOS (`queue.o`, `ppos-all.o`, programas de teste)
+- Arquivos base do PingPongOS:
+  - `queue.o`, `ppos-all.o` (objetos fornecidos)
+  - `disk-driver.o` (para Projeto B)
+  - `pingpong-*.c` (programas de teste)
+  - `disk.dat` (dados do disco virtual para Projeto B)
 
-### Configuração Inicial
+## Configuração Inicial
 ```bash
 # Clone o repositório
 git clone [seu-repositório]
 cd projeto
 
-# Os arquivos de trabalho já estão na raiz
-# Certifique-se de ter os arquivos base do PingPongOS:
-# - queue.o, ppos-all.o (objetos fornecidos)
-# - pingpong-*.c (programas de teste)
-```
+# Verifique arquivos necessários
+make check-files
 
-### Compilação
-```bash
-# Compila todos os testes
-make all
-
-# Compila teste específico
-make pingpong-scheduler
-```
-
-### Execução com Resultados Salvos
-```bash
-# Executa todos os testes e salva em output/
-make test-all
-
-# Executa teste específico
-make test-scheduler
-```
-
-### Execução na Tela
-```bash
-# Ver saída diretamente na tela
-make test-all-screen
-make run-scheduler
-```
-
-### Utilitários
-```bash
-# Ver resultados salvos
-make show-output
-
-# Debug (compila com -DDEBUG -DDEBUG02)
-make debug
-
-# Limpeza
-make clean
-```
-
-### Validação com Saídas de Referência
-```bash
-# Execute os testes e compare com saídas esperadas
-make test-all
-
-# Compare resultado específico
-diff output/pingpong-scheduler.txt expected-output/pingpong-scheduler.txt
-
-# Visualize diferenças lado a lado
-diff -y output/pingpong-scheduler.txt expected-output/pingpong-scheduler.txt
+# Compile projeto desejado
+make all                    # Detecção automática
+# ou
+make project-a              # Força Projeto A
+make project-b              # Força Projeto B
 ```
 
 ## Testes Disponíveis
 
-Os seguintes programas de teste (fornecidos pela disciplina) validam nossa implementação:
-
+### Projeto A
 - **`pingpong-dispatcher`**: Testa funcionamento básico do dispatcher
 - **`pingpong-scheduler`**: Valida escalonador por prioridades e aging
 - **`pingpong-preempcao`**: Testa sistema de preempção por tempo
-- **`pingpong-contab-prio`**: Valida contabilização e ajuste de prioridades  
+- **`pingpong-contab-prio`**: Valida contabilização e ajuste de prioridades
 - **`pingpong-preempcao-stress`**: Teste de stress da preempção
+
+### Projeto B
+- **`pingpong-disco1`**: Teste básico sequencial do disco
+- **`pingpong-disco2`**: Teste com múltiplas tarefas simultâneas
+
+Cada teste do Projeto B é compilado com os 3 algoritmos de escalonamento (FCFS, SSTF, CSCAN) para análise comparativa.
+
+## Análise de Performance (Projeto B)
+
+### Métricas Coletadas
+- **Requisições processadas**: Número total de operações
+- **Movimentação da cabeça**: Blocos percorridos total e médio
+- **Tempo de execução**: Duração total do teste
+- **Operações por tipo**: Contadores de leitura e escrita
+
+### Relatórios Gerados
+- **Comparativo textual**: `output/resumo-comparativo.txt`
+- **Dados estruturados**: `output/metricas.csv`
+- **Logs detalhados**: `output/disco{1,2}-{fcfs,sstf,cscan}.txt`
+
+### Exemplo de Saída
+```
+=== RELATÓRIO DE PERFORMANCE DO SISTEMA ===
+ -- Política ativa: CSCAN
+ -- Requisições processadas: 512
+ -- Operações de leitura: 256
+ -- Operações de escrita: 256
+ -- Movimentação total da cabeça: 6848 blocos
+ -- Movimentação média por requisição: 13.38 blocos
+ -- Tempo total de execução: 29146 ms
+===========================================
+```
 
 ## Decisões de Implementação
 
-### Controle de Preempção
-- Todas as operações críticas são protegidas com `PPOS_PREEMPT_DISABLE/ENABLE`
+### Projeto A
+#### Controle de Preempção
+- Operações críticas são protegidas com `PPOS_PREEMPT_DISABLE/ENABLE`
 - Garante atomicidade durante modificação de estruturas do sistema
 - Evita condições de corrida no escalonador e gerenciamento de tarefas
 
-### Classificação de Tarefas
+#### Classificação de Tarefas
 - **Tarefas de sistema** (ID ≤ 1): main, dispatcher
 - **Tarefas de usuário** (ID > 1): participam do aging e sofrem preempção
 
-### Aging e Prioridades
+#### Aging e Prioridades
 - Fator alpha = -1 (melhora prioridade das não-escolhidas)
 - Limites: -20 (maior prioridade) a +20 (menor prioridade)
 - Reset automático da tarefa escolhida para prioridade estática
 
+### Projeto B
+#### Arquitetura Modular
+- Separação entre processamento de eventos e novas requisições
+- Funções específicas para cada algoritmo de escalonamento
+- Sistema de métricas desacoplado da lógica principal
+
+#### Configuração de Scheduler
+- Política definida em tempo de compilação via `-DSCHEDULER_DEFAULT`
+- Permite comparação objetiva entre algoritmos
+- Flexibilidade para testes específicos
+
+#### Gerenciamento de Estado
+- Rastreamento da posição da cabeça do disco
+- Métricas em tempo real de performance
+- Validação de parâmetros e estados
+
 ## Configurações
 
+### Projeto A
 Constantes principais em `ppos-core-aux.c`:
-
 ```c
-#define QUANTUM_SIZE       20    // Quantum em ticks
-#define TIMER_INTERVAL   1000    // Timer a cada 1ms  
-#define PRIORITY_ALPHA     -1    // Fator de aging
-#define PRIORITY_MAX      -20    // Maior prioridade
-#define PRIORITY_MIN       20    // Menor prioridade
+#define QUANTUM_SIZE       20   // Quantum em ticks
+#define TIMER_INTERVAL   1000   // Timer a cada 1ms
+#define PRIORITY_ALPHA     -1   // Fator de aging
+#define PRIORITY_MAX      -20   // Maior prioridade
+#define PRIORITY_MIN       20   // Menor prioridade
 ```
 
-## Saída Esperada
-
-Cada teste produz saída específica mostrando:
-- Alternância entre tarefas conforme prioridades
-- Aplicação correta do aging
-- Funcionamento da preempção por tempo
-- Estatísticas finais de cada tarefa
-
-Exemplo de estatística final:
+### Projeto B
+Constantes principais em `ppos_disk.c`:
+```c
+#define SCHEDULER_FCFS   1      // First Come, First Served
+#define SCHEDULER_SSTF   2      // Shortest Seek Time First  
+#define SCHEDULER_CSCAN  3      // Circular Scan
+#define ERROR_INVALID   -1      // Código de erro padrão
 ```
-Task 2 exit: execution time 15 ms, processor time 8 ms, 12 activations
+
+## Utilitários do Makefile
+```bash
+# Limpeza
+make clean                  # Remove tudo (preserva disk.dat)
+make clean-bin              # Remove apenas executáveis
+make clean-output           # Remove apenas resultados
+
+# Verificação
+make check-files            # Verifica arquivos necessários
+make list-results           # Lista resultados disponíveis
+
+# Ajuda
+make help                   # Ajuda completa
 ```
 
 ## Observações Técnicas
 
+### Projeto A
 - Implementação focada nos requisitos específicos do Projeto A
 - Compatível com a interface definida no núcleo do PingPongOS
 - Utiliza apenas bibliotecas padrão Unix (`signal.h`, `sys/time.h`)
-- Sistema de hooks completo para instrumentação e debugging
+- Sistema de hooks para instrumentação e debugging
 
+### Projeto B
+- **IMPORTANTE**: Testes modificam o arquivo `disk.dat`
+- Sempre faça backup antes de executar testes de disco
+- Compilação é segura - apenas execução modifica dados
+- Algoritmos implementados seguem especificações da literatura
 
 ## Configuração do Git
-
 Recomenda-se adicionar ao `.gitignore`:
-```
+```gitignore
 # Diretórios gerados durante compilação
 bin/
 output/
@@ -262,12 +402,61 @@ output/
 # Arquivos de backup
 *~
 *.bak
+disk.dat.backup
+
+# Arquivos temporários de teste
+*.tmp
+```
+
+## Validação com Saídas de Referência
+```bash
+# Execute os testes e compare com saídas esperadas
+make test-project-a
+make test-project-b
+
+# Compare resultado específico
+diff output/pingpong-scheduler.txt expected-output/pingpong-scheduler.txt
+
+# Visualize diferenças lado a lado
+diff -y output/pingpong-scheduler.txt expected-output/pingpong-scheduler.txt
 ```
 
 ## Contexto Acadêmico
 
 Este trabalho demonstra a implementação prática de:
+
+### Projeto A
 - Algoritmos de escalonamento de processos
 - Sistemas de tempo real e controle de quantum
 - Contabilização de recursos em sistemas operacionais
 - Técnicas de sincronização e controle de concorrência
+
+### Projeto B
+- Gerenciamento de dispositivos de entrada/saída
+- Algoritmos de escalonamento de disco
+- Otimização de performance em sistemas de armazenamento
+- Análise comparativa de algoritmos
+
+## Performance Esperada (Projeto B)
+
+### Características dos Algoritmos
+
+**FCFS**: 
+- Movimentação: Alta (sem otimização)
+- Fairness: Excelente
+- Complexidade: Baixa
+
+**SSTF**:
+- Movimentação: Baixa (otimizada)
+- Fairness: Pode causar starvation
+- Complexidade: Média
+
+**CSCAN**:
+- Movimentação: Média (balanceada)
+- Fairness: Excelente
+- Complexidade: Média
+
+### Exemplo de Saída Final
+```
+Task 2 exit: execution time 15 ms, processor time 8 ms, 12 activations
+```
