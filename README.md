@@ -171,7 +171,7 @@ make run-preempcao
 make run-contab
 ```
 
-### Projeto B - Disco (⚠️ Modifica disk.dat)
+### Projeto B - Disco (Modifica disk.dat)
 
 #### Compilação (não executa)
 ```bash
